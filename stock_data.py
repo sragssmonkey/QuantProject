@@ -1,12 +1,32 @@
 import yfinance as yf
+
+from timeseries import TimeSeries, HurstExponent,Decision
 from meanreversion import MeanReversion
+from momentumtrading import Momentum
 
 
-data = yf.download("INFY.NS", period="3mo")
-print(data)
+
+data = yf.download("RELIANCE.NS", period="1y")
 
 prices = data["Close"].values.flatten().tolist()
 
-Infosys = MeanReversion("Infosys", prices)
+ts = TimeSeries([], prices)
 
-print(Infosys)
+returns = ts.time_series()
+
+hurst_calc = HurstExponent(returns)
+
+H = hurst_calc.hurst()
+
+print("H:", H)
+decision = Decision(
+    
+    H,
+    "REL",
+    prices
+)
+print(decision)
+strategy = decision.get_strategy()
+
+if strategy:
+    print(strategy)
