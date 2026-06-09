@@ -20,9 +20,9 @@ class MeanReversion:
 
         z=self.zscore()
         if z > 2:
-            return"SHORT THIS STOCK(SELL)"
+            return"SHORT"
         elif z < -2:
-            return"GO LONG(BUY)"
+            return"LONG"
         else:
             return "HOLD"
     def __str__(self) -> str:
