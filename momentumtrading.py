@@ -82,9 +82,9 @@ class Momentum:
         self.RSI = RSI
 
         if RSI < 30:
-            return "BUY"
+            return "LONG"
         elif RSI > 70:
-            return "SELL"
+            return "SHORT"
         else:
             return "HOLD"
         
@@ -96,9 +96,15 @@ class Momentum:
             and
             self.RSI < 60
         ):
-            return "BUY"
+            return "LONG"
         else:
-            return "SELL"
+            return "SHORT"
+        
+    def signal(self):
+        self.momentumtrad()
+        self.ExponentialMovingAverage()
+        self.RelativeStrengthIndex()
+        return self.finaldecision()
     
     def __str__(self):
         trend = self.momentumtrad()

@@ -25,6 +25,10 @@ class MeanReversion:
             return"LONG"
         else:
             return "HOLD"
+        
+    def signal(self):
+        return self.book_trade()
+    
     def __str__(self) -> str:
         z = self.zscore()
         return f'{self.company}: Z-score={z:.2f} → {self.book_trade()}'

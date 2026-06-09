@@ -1,18 +1,15 @@
-from pnl import ROI
 class Account:
-    def __init__(self,acc_balance,entry_price,exit_price):
-        self.acc_balance=acc_balance
-        self.entry_price=entry_price
-        self.exit_price=self.exit_price
-        return acc_balance,entry_price,exit_price
-    
+    def __init__(self, initial_balance=100000):
+        self.balance = initial_balance
+        self.entry_price = None
+        self.exit_price = None
+        self.position_size = 0
 
-    def balance(self):
-        balance_sheet=[]
-        pnl_update=self.ROI.pnl()
-        self.acc_balance+=pnl_update
-        balance_sheet.append(self.acc_balance)
-        return balance_sheet
+    def update_balance(self, pnl):
+        self.balance += pnl
+
+    def get_balance(self):
+        return self.balance
     
     
     

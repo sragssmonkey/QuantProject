@@ -1,59 +1,47 @@
-import math
-from account import Account
-from meanreversion import MeanReversion
+
 import matplotlib.pyplot as plt
 import numpy as np
-from timeseries import TimeSeries
+
 class ROI:
     def __init__(self,prices):
         self.prices=prices
-        ts = TimeSeries([], prices)
-        self.returns_log = ts.time_series()
+        self.trade_pnls = []
     
     def return_val(self):
-        returns_Daily=[]
-        for i in self.returns_log:
-            returns_Daily=[(self.returns_log[i]-self.returns_log[i-1])/self.returns_log[i-1]]*100
-        return returns_Daily
+        returns = []
+        for i in range(1, len(self.prices)):
+            r = (
+                (self.prices[i] - self.prices[i - 1])
+                /
+                self.prices[i - 1]
+            )
+            returns.append(r)
+        return returns
 
-    def StopLoss(self):
-        ret=self.return_val()
-        r=[]
-        for i in ret:
-            r= ret[i]**2
+    def stop_loss(self):
+        returns = self.return_val()
+        volatility = np.std(returns)
+        stop_distance = 2 * volatility
+        return stop_distance
 
-        volatility = np.std(r)
-        stop_loss_order=volatility*2
-        return stop_loss_order
     
-    def PositionSizing(self):
-        balance=self.Account.acc_balance()
-        acc_risk=0.02*balance
-        entry=self.Account.entry_price()
-        trade_risk=entry-self.StopLoss()
+    def position_size(self,balance,entry_price,stop_price):
+        account_risk = 0.02 * balance
+        trade_risk = abs(entry_price - stop_price)
         if trade_risk == 0:
             return 0
-        position_size=acc_risk//trade_risk
-        return position_size
+        qty = int(account_risk / trade_risk)
+        return qty
     
-    def pnl(self):
-
-        entry = self.Account.entry_price()
-        exit_price = self.Account.exit_price()
-
-        qty = self.PositionSizing()
-
-        side = self.MeanReversion.book_trade()
-
+    def calculate_pnl(self,side,entry,exit_price,qty):
         if side == "LONG":
-            pnl_ = qty * (exit_price - entry)
-
+            pnl = (exit_price - entry) * qty
         elif side == "SHORT":
-            pnl_ = qty * (entry - exit_price)
-
-        self.trade_pnls.append(pnl_)
-
-        return pnl_
+            pnl = (entry - exit_price) * qty
+        else:
+            pnl = 0
+        self.trade_pnls.append(pnl)
+        return pnl
     
     def plot_pnl(self):
 
