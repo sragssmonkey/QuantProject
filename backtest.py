@@ -30,7 +30,7 @@ class Backtest:
                 continue
             entry_price = (self.prices[day])
             roi = ROI(window)
-            stop_distance = (roi.stop_loss())
+            stop_distance = (roi.stop_loss(entry_price))
             if signal == "LONG":
                 stop_price = (entry_price-stop_distance)
             elif signal == "SHORT":
@@ -42,6 +42,13 @@ class Backtest:
             exit_price = (self.prices[day + 5])
 
             pnl = (self.roi.calculate_pnl(signal,entry_price,exit_price,quantity))
+            print("Entry:", entry_price)
+
+            print("Stop Distance:", stop_distance)
+
+            print("Stop Price:", stop_price)
+            print("Quantity:", quantity)
+            print("PnL:", pnl)
             self.account.update_balance(pnl)
             self.equity_curve.append(self.account.balance)
             self.trade_log.append({

@@ -18,10 +18,11 @@ class ROI:
             returns.append(r)
         return returns
 
-    def stop_loss(self):
+    
+    def stop_loss(self, entry_price):
         returns = self.return_val()
         volatility = np.std(returns)
-        stop_distance = 2 * volatility
+        stop_distance = (2* volatility* entry_price)
         return stop_distance
 
     
