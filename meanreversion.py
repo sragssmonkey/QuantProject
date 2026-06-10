@@ -29,6 +29,10 @@ class MeanReversion:
     def signal(self):
         return self.book_trade()
     
+    def exit_signal(self):
+
+        return abs(self.zscore()) < 0.5
+    
     def __str__(self) -> str:
         z = self.zscore()
         return f'{self.company}: Z-score={z:.2f} → {self.book_trade()}'

@@ -1,5 +1,5 @@
 from backtest import Backtest
-bt = Backtest("INFY.NS")
+bt = Backtest("NESTLEIND.NS")
 
 bt.run()
 

@@ -106,6 +106,9 @@ class Momentum:
         self.RelativeStrengthIndex()
         return self.finaldecision()
     
+    def exit_signal(self):
+        return (self.ExponentialMovingAverage()== "SELL")
+    
     def __str__(self):
         trend = self.momentumtrad()
         ema_signal = self.ExponentialMovingAverage()

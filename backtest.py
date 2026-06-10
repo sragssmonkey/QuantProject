@@ -41,7 +41,7 @@ class Backtest:
                 continue
             quantity = (roi.position_size(self.account.balance,entry_price,stop_price))
 
-            exit_price = (self.prices[day + 5])
+            exit_price = self.prices[day+5]
 
             pnl = (self.roi.calculate_pnl(signal,entry_price,exit_price,quantity))
             print("Entry:", entry_price)
