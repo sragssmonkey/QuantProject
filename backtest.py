@@ -1,12 +1,14 @@
 import yfinance as yf
 import numpy as np
-
+import pandas as pd
 from account import Account
 from pnl import ROI
+import os
 
 from timeseries import (TimeSeries,HurstExponent,Decision)
 class Backtest:
     def __init__(self,ticker,period="1y",initial_balance=100000):
+        self.ticker =ticker
         data = yf.download(ticker,period=period)
         self.prices = (data["Close"].values.flatten().tolist())
         self.account = Account(initial_balance)
@@ -116,3 +118,43 @@ class Backtest:
         plt.ylabel("Portfolio Value")
         plt.grid(True)
         plt.show()
+
+
+    def export_summary(self, filename="all_results.csv"):
+
+        summary = pd.DataFrame([{
+
+            "Company Name": self.ticker,
+
+            "Final Balance": self.FinalBalance(),
+
+            "Total Return": self.TotalReturn(),
+
+            "Win Rate": self.WinRate(),
+
+            "Sharpe Ratio": self.SharpeRatio(),
+
+            "Max Drawdown": self.max_drawdown()
+
+        }])
+
+        if os.path.exists(filename):
+
+            summary.to_csv(
+                filename,
+                mode="a",
+                header=False,
+                index=False
+            )
+
+        else:
+
+            summary.to_csv(
+                filename,
+                index=False
+            )
+    def export_trades(self):
+        filename="trades.csv"
+        df=pd.DataFrame(self.trade_log)
+        df.to_csv(filename,index=False)
+        print(f"Trade logs saved to {filename}")

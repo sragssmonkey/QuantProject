@@ -1,5 +1,5 @@
 from backtest import Backtest
-bt = Backtest("RELIANCE.NS")
+bt = Backtest("INFY.NS")
 
 bt.run()
 
@@ -10,3 +10,5 @@ print("Sharpe Ratio:", bt.SharpeRatio())
 print("Max Drawdown:", bt.max_drawdown())
 
 bt.plot_equity_curve()
+bt.export_trades()
+bt.export_summary()
