@@ -7,7 +7,7 @@ import os
 
 from timeseries import (TimeSeries,HurstExponent,Decision)
 class Backtest:
-    def __init__(self,ticker,period="1y",initial_balance=100000):
+    def __init__(self,ticker,period="1y",initial_balance=100000,holding_period=5,mode="hurst"):
         self.ticker =ticker
         data = yf.download(ticker,period=period)
         self.prices = (data["Close"].values.flatten().tolist())
@@ -15,20 +15,59 @@ class Backtest:
         self.trade_log = []
         self.equity_curve = [initial_balance]
         self.roi = ROI(self.prices)
+        self.holding_period = holding_period
+        self.mode=mode
     
     def run(self):
         lookback = 100
-        for day in range(lookback,len(self.prices) - 5):
+        day = lookback
+
+        while day < len(self.prices) - self.holding_period:
+
             window = self.prices[day-lookback:day]
             ts = TimeSeries([],window)
             returns = ts.time_series()
             hurst = HurstExponent(returns).hurst()
             decision = Decision(hurst,"STOCK",window)
-            strategy = (decision.get_strategy())
+            if self.mode == "hurst":
+
+                decision = Decision(
+                    hurst,
+                    "STOCK",
+                    window
+                )
+
+                strategy = decision.get_strategy()
+
+            elif self.mode == "momentum":
+
+                from momentumtrading import Momentum
+
+                strategy = Momentum(
+                    window
+                )
+
+            elif self.mode == "mean_reversion":
+
+                from meanreversion import MeanReversion
+
+                strategy = MeanReversion(
+                    "STOCK",
+                    window
+                )
+
+            else:
+
+                strategy = None
+
             if strategy is None:
+
+                day += 1
+
                 continue
             signal = strategy.signal()
             if signal == "HOLD":
+                day+=1
                 continue
             entry_price = (self.prices[day])
             roi = ROI(window)
@@ -40,8 +79,10 @@ class Backtest:
             else:
                 continue
             quantity = (roi.position_size(self.account.balance,entry_price,stop_price))
-
-            exit_price = self.prices[day+5]
+            exit_day = min(day + self.holding_period,len(self.prices)-1)
+            
+            exit_price = self.prices[exit_day]
+            day = exit_day + 1
 
             pnl = (self.roi.calculate_pnl(signal,entry_price,exit_price,quantity))
             print("Entry:", entry_price)
@@ -70,7 +111,15 @@ class Backtest:
             })
 
         return self.trade_log
+    def BuyAndHold(self):
 
+        return (
+
+            (self.prices[-1] - self.prices[0])
+            /
+            self.prices[0]
+
+        ) * 100
     def SharpeRatio(self):
         pnls = [trade["pnl"] for trade in self.trade_log]
         if len(pnls) < 2:

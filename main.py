@@ -1,14 +1,15 @@
 from backtest import Backtest
-bt = Backtest("NESTLEIND.NS")
 
-bt.run()
+for hold in range(1,31):
 
-print("Final Balance:", bt.FinalBalance())
-print("Total Return:", bt.TotalReturn())
-print("Win Rate:", bt.WinRate())
-print("Sharpe Ratio:", bt.SharpeRatio())
-print("Max Drawdown:", bt.max_drawdown())
+    bt = Backtest(
+        "TCS.NS",
+        holding_period=hold
+    )
 
-bt.plot_equity_curve()
-bt.export_trades()
-bt.export_summary()
+    bt.run()
+
+    print(
+        hold,
+        bt.TotalReturn()
+    )
